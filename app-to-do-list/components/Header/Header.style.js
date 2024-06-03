@@ -6,6 +6,7 @@ const s = StyleSheet.create({
     },
     subtitle: {
         marginTop: -20,
+        marginBottom: 20,
         fontSize: 20,
         color: "#ABABAB",
     },
