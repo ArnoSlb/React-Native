@@ -1,14 +1,16 @@
 import { Text, View, ScrollView } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import { useState } from "react";
+import React, { useState } from "react";
 
 import { Header } from "@/components/Header/Header";
 import { CardToDo } from "@/components/CardToDo/CardToDo";
+import { TabBottomMenu } from "@/components/TabBottomMenu/TabBottomMenu";
 
 import { s } from "./index.style";
 
 export default function Index() {
 
+  const [selectedTabName, setSelectedTabName] = useState("all")
   const [todoList, setTodoList] = useState([
     { id: 1, title: "Sortir le chien", isCompleted: true },
     { id: 2, title: "Aller chez le garagiste", isCompleted: false },
@@ -19,10 +21,25 @@ export default function Index() {
     { id: 7, title: "Appeler le vétérinaire", isCompleted: true },
   ]);
 
+  function updateTodo(todo){
+    const updatedTodo = {
+      ...todo,
+      isCompleted: !todo.isCompleted
+    }
+
+    const indexToUpdate = todoList.findIndex(
+      (todo) => todo.id === updatedTodo.id
+    )
+
+    const updatedTodoList = [...todoList];
+    updatedTodoList[indexToUpdate] = updatedTodo;
+    setTodoList(updatedTodoList);
+  }
+
   function renderTodoList(){
     return todoList.map((todo)=>(
     <View style={s.cardItem} key={todo.id}>
-      <CardToDo todo={todo}/>
+      <CardToDo onPress={updateTodo} todo={todo}/>
     </View>
     ));
   }
@@ -40,7 +57,7 @@ export default function Index() {
         </SafeAreaView>
       </SafeAreaProvider>
       <View style={s.footer}>
-            <Text>Footer</Text>
+            <TabBottomMenu selectedTabName={selectedTabName} onPress={setSelectedTabName}/>
       </View>
     </>
   );
