@@ -21,6 +21,17 @@ export default function Index() {
     { id: 7, title: "Appeler le vétérinaire", isCompleted: true },
   ]);
 
+  function getFilteredList(){
+    switch(selectedTabName){
+      case "all":
+        return todoList;
+      case "inProgress":
+        return todoList.filter((todo) => !todo.isCompleted);
+      case "done":
+        return todoList.filter((todo) => todo.isCompleted)
+    }
+  }
+
   function updateTodo(todo){
     const updatedTodo = {
       ...todo,
@@ -37,7 +48,7 @@ export default function Index() {
   }
 
   function renderTodoList(){
-    return todoList.map((todo)=>(
+    return getFilteredList().map((todo)=>(
     <View style={s.cardItem} key={todo.id}>
       <CardToDo onPress={updateTodo} todo={todo}/>
     </View>
@@ -56,9 +67,11 @@ export default function Index() {
           </View>  
         </SafeAreaView>
       </SafeAreaProvider>
-      <View style={s.footer}>
-            <TabBottomMenu selectedTabName={selectedTabName} onPress={setSelectedTabName}/>
-      </View>
+      <TabBottomMenu 
+        todoList={todoList}
+        selectedTabName={selectedTabName} 
+        onPress={setSelectedTabName}
+      />
     </>
   );
 }
