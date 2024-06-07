@@ -1,8 +1,9 @@
 import { Text, View, ScrollView, Alert } from "react-native";
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "react-native-dialog";
 import uuid from "react-native-uuid";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { Header } from "@/components/Header/Header";
 import { CardToDo } from "@/components/CardToDo/CardToDo";
@@ -12,12 +13,51 @@ import { ButtonAdd } from "@/components/ButtonAdd/ButtonAdd";
 
 import { s } from "./index.style";
 
+let isFirstRender = true;
+let isLoadUpdate = false;
+
 export default function Index() {
 
   const [selectedTabName, setSelectedTabName] = useState("all")
   const [todoList, setTodoList] = useState([]);
   const [isAddDialogVisible, setIsAddDialogVisible] = useState(false);
   const [inputValue, setInputValue] = useState("");
+
+  useEffect(()=>{
+    loadTodoList()
+  },[])
+
+  useEffect(()=>{
+    if(isLoadUpdate){
+      isLoadUpdate= false;
+    }
+    if(!isFirstRender){
+      saveTodoList()
+    } else {
+      isFirstRender = false;
+    }
+  }, [todoList])
+
+  async function saveTodoList(){
+    try {
+        await AsyncStorage.setItem("@todoList", JSON.stringify(todoList))
+    } catch (error) {
+        alert("Erreur " + error)
+    }
+  }
+
+  async function loadTodoList(){
+    try {
+      const stringifiedTodoList = await AsyncStorage.getItem("@todoList");
+      if(stringifiedTodoList !== null){
+        const parsedTodoList = JSON.parse(stringifiedTodoList);
+        isLoadUpdate = true;
+        setTodoList(parsedTodoList);
+      }
+    } catch (error) {
+      alert("Erreur " + error)
+    }
+  }
 
   function getFilteredList(){
     switch(selectedTabName){
